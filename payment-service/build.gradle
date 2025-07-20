@@ -1,0 +1,16 @@
+dependencies {
+    implementation project(":common")
+    implementation libs.springBootDataJpa
+    implementation libs.postgreSQL
+    implementation libs.lombok
+    annotationProcessor libs.lombok
+
+    // MapStruct
+    implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+
+
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+}

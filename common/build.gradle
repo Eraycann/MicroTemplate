@@ -1,0 +1,13 @@
+dependencies {
+    implementation libs.lombok
+    annotationProcessor libs.lombok
+    implementation libs.springBootDataJpa
+
+    // Spring Security'nin temelini ve SecurityContextHolder'ı sağlar
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    // JWT işleme, 'Jwt' sınıfı ve 'getClaim' metodu için gerekli olan ana bağımlılık
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+
+
+}

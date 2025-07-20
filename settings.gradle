@@ -1,0 +1,6 @@
+rootProject.name = 'MicroTemplate'
+include 'common'
+include 'payment-service'
+include 'user-service'
+include 'gateway-service'
+

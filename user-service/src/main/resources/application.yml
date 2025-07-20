@@ -1,0 +1,24 @@
+# user-service application.yml
+server:
+  port: 9090
+
+spring:
+  application:
+    name: user-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/userdb
+    username: postgres
+    password: password
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+security:
+  jwt:
+    secret: "secret-key-abc123"
+    expiration: 86400000 # 1 gün
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html

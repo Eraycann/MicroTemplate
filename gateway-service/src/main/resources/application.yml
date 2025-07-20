@@ -1,0 +1,37 @@
+server:
+  port: 8080 # Gateway servisinin dinleyeceği port numarası. Gelen tüm dış istekler bu port üzerinden alınır.
+
+spring:
+  application:
+    name: gateway-service # Bu Spring Boot uygulamasının adı. Özellikle Eureka gibi servis keşfi araçlarında kullanılır.
+
+resilience4j:
+  circuitbreaker: # Resilience4j'nin Devre Kesici (Circuit Breaker) ayarları.
+    instances: # Tanımlanacak Circuit Breaker örnekleri. Her bir servis için ayrı bir devre kesici tanımlanabilir.
+      userServiceCircuit: # 'user-service' mikroservisi için devre kesici ayarları.
+        registerHealthIndicator: true # Bu devre kesicinin durumunun Actuator'un sağlık endpoint'inde (/actuator/health) görünmesini sağlar.
+        # Devre kesici OPEN olduğunda servisin sağlıksız görünmesine yardımcı olur.
+        slidingWindowSize: 5 # Devre kesicinin hata oranını hesaplamak için kullanacağı son istek sayısı.
+        # Örneğin, son 5 isteğin sonuçlarını değerlendirir.
+        failureRateThreshold: 50 # Yüzde cinsinden hata oranı eşiği. Eğer 'slidingWindowSize' içindeki isteklerin %50'si veya
+        # daha fazlası başarısız olursa, devre kesici OPEN (açık) duruma geçer.
+        waitDurationInOpenState: 10s # Devre kesici OPEN duruma geçtikten sonra ne kadar süre bu durumda kalacağını belirler.
+        # Bu süre sonunda devre kesici HALF_OPEN (yarı açık) duruma geçer ve test isteklerine izin verir.
+      paymentServiceCircuit: # 'payment-service' mikroservisi için devre kesici ayarları.
+        registerHealthIndicator: true # Aynı şekilde, bu devre kesicinin de sağlık durumunu izlemek için Actuator'a kaydeder.
+        slidingWindowSize: 5 # Payment servisi için de son 5 isteği değerlendir.
+        failureRateThreshold: 50 # Payment servisi için de %50 hata oranında devre kesiciyi aç.
+        waitDurationInOpenState: 10s # Payment servisi için de devre kesici açık kaldıktan sonra 10 saniye bekle.
+
+
+management: # Spring Boot Actuator endpoint'lerinin yönetimi.
+  endpoints:
+    web:
+      exposure:
+        include: "*" # Tüm Actuator endpoint'lerinin web üzerinden erişilebilir olmasını sağlar (örn. /actuator/health, /actuator/metrics, vb.).
+        # Güvenlik açısından, üretimde bu "*" yerine sadece ihtiyaç duyulan endpoint'ler (örn. "health", "info") listelenmelidir.
+
+jwt:
+  secret: "secret-key-abc123" # JWT token'larını imzalamak ve doğrulamak için kullanılan gizli anahtar.
+    # Üretim ortamında daha güçlü (uzun ve karmaşık) ve güvenli bir şekilde saklanan bir anahtar kullanılmalıdır.
+  # En az 256 bit (32 karakter) uzunluğunda olması güvenlik için önemlidir.

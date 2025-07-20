@@ -1,0 +1,51 @@
+dependencies {
+    // Spring Cloud Gateway: Mikroservislerinizin önünde duran, gelen istekleri doğru servislere yönlendiren
+    // ve çeşitli filtreleme, güvenlik, yük dengeleme gibi özellikleri sağlayan ana bileşendir.
+    // Reactive bir yapıya sahiptir.
+    implementation 'org.springframework.cloud:spring-cloud-starter-gateway'
+
+    // Spring WebFlux: Spring Cloud Gateway zaten WebFlux üzerine inşa edildiği için bu bağımlılık
+    // genellikle zaten gelir. Ancak açıkça eklemek, projenizin reaktif bir web uygulaması olduğunu
+    // belirtmenin bir yoludur ve reaktif programlama yeteneklerini sağlar.
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+    // Spring Cloud Resilience4j Circuit Breaker: Mikroservisler arası iletişimde hatalara karşı dayanıklılık sağlar.
+    // Özellikle Circuit Breaker (Devre Kesici) ve Retry (Yeniden Dene) gibi mekanizmalarla,
+    // bir servisin çökmesi durumunda diğer servislerin etkilenmesini önler.
+    // 'reactor-resilience4j' kısmı, reaktif (WebFlux) uygulamalarla uyumlu çalıştığını belirtir.
+    implementation 'org.springframework.cloud:spring-cloud-starter-circuitbreaker-reactor-resilience4j'
+
+    // Spring Boot Actuator: Uygulamanızın üretim ortamında izlenmesi ve yönetilmesi için endpoint'ler (API uç noktaları) sağlar.
+    // Sağlık kontrolü, metrikler, uygulama bilgileri gibi verilere erişmenizi sağlar.
+    // Gateway gibi kritik bir servisi izlemek için önemlidir.
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+    // Spring Security: Uygulamanızda kimlik doğrulama (authentication) ve yetkilendirme (authorization)
+    // özelliklerini entegre etmek için kullanılır. Gelen isteklerin kimliğini doğrular ve erişim kurallarını uygular.
+    // JWT ile birlikte çalışarak stateless güvenlik sağlar.
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    // JWT (JSON Web Token) API: JWT'leri oluşturmak, ayrıştırmak ve doğrulamak için kullanılan JJWT kütüphanesinin API modülüdür.
+    // Sadece arayüzleri ve temel yapıları tanımlar.
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+
+    // JWT Implementation: JJWT API'sinin gerçek implementasyonunu sağlar.
+    // Token'ı imzalamak ve doğrulamak için gerekli algoritma ve metodları içerir.
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+
+    // JWT JSON İşleyicisi: JWT'nin JSON yapısını (payload) ayrıştırmak ve oluşturmak için Jackson kütüphanesiyle entegrasyon sağlar.
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+}
+
+dependencyManagement {
+    // Maven BOM (Bill Of Materials) importu: Spring Cloud bağımlılıkları için uyumlu versiyonları otomatik olarak yönetir.
+    // Bu sayede, farklı Spring Cloud projelerinin (Gateway, Resilience4j, vs.) birbirleriyle ve
+    // Spring Boot ile uyumlu versiyonlarını manuel olarak belirtme zahmetinden kurtulursunuz.
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:2023.0.1"
+    }
+    /*
+    2. dependencyManagement kısmı yoksa, Spring Cloud bağımlılıklarının uyumlu versiyonları otomatik olarak çekilemez.
+    Bu yüzden dependencyManagement bloğunu eklemek çok önemlidir. Bu blok olmadan versiyon çakışmaları yaşayabilirsiniz.
+    */
+}
