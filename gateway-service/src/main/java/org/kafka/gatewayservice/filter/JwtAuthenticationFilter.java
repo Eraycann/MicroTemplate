@@ -1,10 +1,6 @@
 package org.kafka.gatewayservice.filter;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
-import jakarta.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Value;
+import org.kafka.gatewayservice.util.JwtUtil;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.http.HttpHeaders;
@@ -13,50 +9,43 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
-import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
-
+// 🔐 JWT doğrulaması yapan Gateway filtresi
 @Component
 public class JwtAuthenticationFilter implements GatewayFilter {
 
-    // Secret key application.yml üzerinden alınır
-    @Value("${jwt.secret}")
-    private String secret;
+    private final JwtUtil jwtUtil;
 
-    private SecretKey secretKey;
-
-    // SecretKey objesi oluşturulur. Deprecation olmayan yolla yapılır.
-    @PostConstruct
-    public void init() {
-        this.secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+    public JwtAuthenticationFilter(JwtUtil jwtUtil) {
+        this.jwtUtil = jwtUtil;
     }
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+        HttpHeaders headers = exchange.getRequest().getHeaders();
 
-        // Authorization header yoksa ya da 'Bearer ' ile başlamıyorsa 401 döndür
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        // Authorization header mevcut değilse 401 döndür
+        if (!headers.containsKey(HttpHeaders.AUTHORIZATION)) {
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
             return exchange.getResponse().setComplete();
         }
 
-        String token = authHeader.substring(7);
-        try {
-            // Token parse edilir ve içeriğindeki claim'ler (kullanıcı bilgisi vs.) alınır
-            Claims claims = Jwts.parserBuilder()
-                    .setSigningKey(secretKey)
-                    .build()
-                    .parseClaimsJws(token)
-                    .getBody();
+        // Token’ı “Bearer ” kısmını çıkararak al
+        String token = headers.getFirst(HttpHeaders.AUTHORIZATION).replace("Bearer ", "");
 
+        try {
+            // Token doğrulaması yapılır
+            jwtUtil.validateToken(token);
+
+            // İsteğe bağlı olarak kullanıcı adı çıkarılabilir
+            String username = jwtUtil.extractUsername(token);
 
         } catch (Exception e) {
-            // Token geçersiz veya süresi dolmuşsa 401 döndür
+            // Token geçersizse 401 Unauthorized
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
             return exchange.getResponse().setComplete();
         }
 
+        // Token geçerliyse diğer filtrelere devam et
         return chain.filter(exchange);
     }
 }

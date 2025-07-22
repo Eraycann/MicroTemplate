@@ -32,6 +32,29 @@ management: # Spring Boot Actuator endpoint'lerinin yönetimi.
         # Güvenlik açısından, üretimde bu "*" yerine sadece ihtiyaç duyulan endpoint'ler (örn. "health", "info") listelenmelidir.
 
 jwt:
-  secret: "secret-key-abc123" # JWT token'larını imzalamak ve doğrulamak için kullanılan gizli anahtar.
-    # Üretim ortamında daha güçlü (uzun ve karmaşık) ve güvenli bir şekilde saklanan bir anahtar kullanılmalıdır.
-  # En az 256 bit (32 karakter) uzunluğunda olması güvenlik için önemlidir.
+  secret: "secret-key-abc123" # JWT için kullanılan gizli anahtar (prod ortamda env’den alınmalı)
+
+
+  cloud:
+    gateway:
+      default-filters:
+        - name: RequestRateLimiter
+          args:
+            redis-rate-limiter.replenishRate: 10   # Saniyede 10 istek
+            redis-rate-limiter.burstCapacity: 20   # Anlık 20 istek burst limiti
+            key-resolver: "#{@ipKeyResolver}"       # IP'ye göre sınırlama
+
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "*"     # Tüm domain'lerden istek kabul edilir
+            allowedMethods: "*"     # Tüm HTTP metodlarına izin verilir
+            allowedHeaders: "*"     # Tüm header’lara izin verilir
+
+  redis:
+    host: localhost
+    port: 6379
+
+logging:
+  level:
+    root: INFO

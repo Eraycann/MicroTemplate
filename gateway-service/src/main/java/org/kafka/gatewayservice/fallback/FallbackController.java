@@ -1,16 +1,15 @@
-package org.kafka.gatewayservice.controller;
+package org.kafka.gatewayservice.fallback;
 
 import org.kafka.gatewayservice.exception.dto.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
-
 @RestController
 @RequestMapping("/fallback")
 public class FallbackController {
 
+    // 🔁 User servisi hatalıysa dönecek fallback mesajı
     @GetMapping("/user")
     public ResponseEntity<ErrorResponse> userFallback() {
         ErrorResponse errorResponse = new ErrorResponse(
@@ -21,6 +20,7 @@ public class FallbackController {
                 .body(errorResponse);
     }
 
+    // 🔁 Payment servisi hatalıysa dönecek fallback mesajı
     @GetMapping("/payment")
     public ResponseEntity<ErrorResponse> paymentFallback() {
         ErrorResponse errorResponse = new ErrorResponse(

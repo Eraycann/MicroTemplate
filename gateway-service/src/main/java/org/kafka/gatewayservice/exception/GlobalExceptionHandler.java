@@ -5,10 +5,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    // 💥 Tüm exception'ları yakalayıp ErrorResponse DTO'su ile döner
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleAllExceptions(Exception ex) {
         ErrorResponse errorResponse = new ErrorResponse(

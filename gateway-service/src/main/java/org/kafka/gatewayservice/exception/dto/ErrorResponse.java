@@ -1,13 +1,9 @@
 package org.kafka.gatewayservice.exception.dto;
 
-
-import java.util.List;
-
-// exceptionla birlikte var.
-// hata fırlatıldığı zaman, handlerde yakalar ve geri dönüş DTO'su, ErrorResponse şeklindedir.
+// 📦 API tarafından döndürülecek hata nesnesi
 public class ErrorResponse {
-    private String code;
-    private String message;
+    private String code;    // Örneğin: GATEWAY_ERROR, SERVICE_UNAVAILABLE
+    private String message; // Hata mesajı
 
     public ErrorResponse(String code, String message) {
         this.code = code;
